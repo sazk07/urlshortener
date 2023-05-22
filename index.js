@@ -39,7 +39,7 @@ app.post('/api/shorturl', (req, res) => {
         originalUrl,
         postShortUrl
       });
-      res.json({
+      return res.json({
         original_url: originalUrl,
         short_url: postShortUrl
       })
@@ -54,9 +54,9 @@ app.get('/api/shorturl/:getShortUrl', (req, res) => {
     return item.postShortUrl === getShortUrl
   })
   try {
-    res.redirect(urlData.originalUrl)
+    return res.redirect(urlData.originalUrl)
   } catch (error) {
-    res.json({
+    return res.json({
       error: "invalid url"
     })
   }
