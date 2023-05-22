@@ -25,10 +25,10 @@ app.get('/api/hello', function(req, res) {
 const urls = []
 let counter = 1
 const isValidUrl = (url) => {
-  const urlRegex = /^(https?):\/\/(\w+\.)+\w{2,}\/?(\S+)?$/;
+  const urlRegex = /^(https{1}):\/\/(\w+\.)+\w{2,}\/?(\S+)?$/;
   return urlRegex.test(url)
 }
-app.route('/api/shorturl/:getShortUrl?').post((req, res) => {
+app.post('/api/shorturl', (req, res) => {
   let returnVal
   const originalUrl = req.body.url
   // check if url is valid
@@ -36,21 +36,22 @@ app.route('/api/shorturl/:getShortUrl?').post((req, res) => {
     returnVal = {
       error: "invalid url"
     }
-  }
-  // if is valid url, generate short url
-  const postShortUrl = counter++
-  urls.push({
-    originalUrl,
-    postShortUrl
-  });
-  // return json response
-  returnVal = {
-    original_url: originalUrl,
-    short_url: postShortUrl
+  } else {
+    // if is valid url, generate short url
+    const postShortUrl = counter++
+    urls.push({
+      originalUrl,
+      postShortUrl
+    });
+    // return json response
+    returnVal = {
+      original_url: originalUrl,
+      short_url: postShortUrl
+    }
   }
   return res.json(returnVal)
 })
-  .get((req, res) => {
+  app.get('/api/shorturl/:getShortUrl', (req, res) => {
     const getShortUrl = parseInt(req.params.getShortUrl);
     // get original url based on short url
     const urlData = urls.find((item) => {
