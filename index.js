@@ -22,35 +22,31 @@ app.get('/api/hello', function(req, res) {
   res.json({ greeting: 'hello API' });
 });
 
+
 const urls = []
 let counter = 1
-const isValidUrl = (url) => {
-  const urlRegex = /^(https{1}):\/\/(\w+\.)+\w{2,}\/?(\S+)?$/;
-  return urlRegex.test(url)
-}
 app.post('/api/shorturl', (req, res) => {
-  let returnVal
   const originalUrl = req.body.url
   // check if url is valid
-  if(!isValidUrl(originalUrl)) {
-    returnVal = {
-      error: "invalid url"
+  const dns = require('dns');
+  const hostName = new URL(originalUrl).hostname;
+  dns.lookup(hostName, (err, address, family) => {
+    if (err) {
+      return res.json({ error: 'invalid url' });
+    } else {
+      const postShortUrl = counter++
+      urls.push({
+        originalUrl,
+        postShortUrl
+      });
+      res.json({
+        original_url: originalUrl,
+        short_url: postShortUrl
+      })
     }
-  } else {
-    // if is valid url, generate short url
-    const postShortUrl = counter++
-    urls.push({
-      originalUrl,
-      postShortUrl
-    });
-    // return json response
-    returnVal = {
-      original_url: originalUrl,
-      short_url: postShortUrl
-    }
-  }
-  return res.json(returnVal)
+  })
 })
+
 app.get('/api/shorturl/:getShortUrl', (req, res) => {
   const getShortUrl = parseInt(req.params.getShortUrl);
   // get original url based on short url
@@ -58,9 +54,9 @@ app.get('/api/shorturl/:getShortUrl', (req, res) => {
     return item.postShortUrl === getShortUrl
   })
   try {
-    return res.redirect(urlData.originalUrl)
+    res.redirect(urlData.originalUrl)
   } catch (error) {
-    return res.json({
+    res.json({
       error: "invalid url"
     })
   }
