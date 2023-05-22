@@ -51,20 +51,20 @@ app.post('/api/shorturl', (req, res) => {
   }
   return res.json(returnVal)
 })
-  app.get('/api/shorturl/:getShortUrl', (req, res) => {
-    const getShortUrl = parseInt(req.params.getShortUrl);
-    // get original url based on short url
-    const urlData = urls.find((item) => {
-      return item.postShortUrl === getShortUrl
-    })
-    try {
-      return res.redirect(urlData.originalUrl)
-    } catch (error) {
-      return res.json({
-        error: "invalid url"
-      })
-    }
+app.get('/api/shorturl/:getShortUrl', (req, res) => {
+  const getShortUrl = parseInt(req.params.getShortUrl);
+  // get original url based on short url
+  const urlData = urls.find((item) => {
+    return item.postShortUrl === getShortUrl
   })
+  try {
+    return res.redirect(urlData.originalUrl)
+  } catch (error) {
+    return res.json({
+      error: "invalid url"
+    })
+  }
+})
 
 app.listen(port, function() {
   console.log(`Listening on port ${port}`);
