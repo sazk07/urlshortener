@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const asyncHandler = require('express-async-handler')
 const app = express();
 
 // Basic Configuration
@@ -18,14 +19,18 @@ app.get('/', function(req, res) {
 });
 
 // Your first API endpoint
-app.get('/api/hello', function(req, res) {
-  res.json({ greeting: 'hello API' });
-});
+async function hello_cb(req, res, next) {
+  res.json({
+    greeting: 'hello API'
+  })
+}
+
+app.get('/api/hello', asyncHandler(hello_cb));
 
 
 const urls = []
 let counter = 1
-app.post('/api/shorturl', (req, res) => {
+const shorturl_cb = async (req, res, next) => {
   const originalUrl = req.body.url
   // check if url is valid
   const dns = require('dns');
@@ -45,9 +50,10 @@ app.post('/api/shorturl', (req, res) => {
       })
     }
   })
-})
+}
+app.post('/api/shorturl', asyncHandler(shorturl_cb))
 
-app.get('/api/shorturl/:getShortUrl', (req, res) => {
+const getShortUrl_cb = async (req, res, next) => {
   const getShortUrl = parseInt(req.params.getShortUrl);
   // get original url based on short url
   const urlData = urls.find((item) => {
@@ -60,7 +66,8 @@ app.get('/api/shorturl/:getShortUrl', (req, res) => {
       error: "invalid url"
     })
   }
-})
+}
+app.get('/api/shorturl/:getShortUrl', asyncHandler(getShortUrl_cb) )
 
 app.listen(port, function() {
   console.log(`Listening on port ${port}`);
